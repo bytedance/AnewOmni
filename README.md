@@ -42,8 +42,12 @@ conda activate AnewOmni
 
 ## Model Checkpoints
 
-The trained model checkpoints will be provided at xxx. Please download it into the `checkpoints` folder.
+The trained model checkpoint (`model.ckpt`) is provided at [github release](https://github.com/bytedance/AnewOmni/releases/tag/init). Please download it into the `checkpoints` folder.
 
+```bash
+cd checkpoints
+wget https://github.com/bytedance/AnewOmni/releases/download/init/model.ckpt
+```
 
 # :eyes: Usage
 
