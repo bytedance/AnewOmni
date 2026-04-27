@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnewOmni Prompt UI</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="interaction-lock" class="interaction-lock hidden" aria-hidden="true"></div>
+  <div class="app">
+    <div class="toolbar">
+      <button id="exec-btn">Execute</button>
+      <button id="run-btn">Run Generation</button>
+      <button id="reset-btn">Reset</button>
+      <select id="task-select" class="task-select"></select>
+      <input id="save-dir-input" type="text" placeholder="Optional save_dir for generation">
+    </div>
+    <div class="columns">
+      <section class="panel">
+        <h2>Program</h2>
+        <textarea id="code-editor" spellcheck="false"></textarea>
+        <pre id="exec-output" class="output"></pre>
+      </section>
+      <section class="panel">
+        <h2 id="prompt-title">Current Prompt</h2>
+        <div class="prompt-stage">
+          <div id="prompt-svg" class="svg-box empty">No SVG yet</div>
+        </div>
+        <div id="cdr-control-panel" class="subpanel" style="display: none;">
+          <h3>CDR Control</h3>
+          <div id="cdr-control-svg" class="svg-box empty">No CDR control view</div>
+          <div class="result-nav">
+            <button id="cdr-prev-btn" type="button">Prev</button>
+            <span id="cdr-page-label">1 / 1</span>
+            <button id="cdr-next-btn" type="button">Next</button>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="subpanel">
+            <h3>Fragment Mapping</h3>
+            <pre id="prompt-mapping" class="mapping-box">No fragment mapping</pre>
+            <div id="peptide-nsaa-previews" class="preview-grid"></div>
+          </div>
+          <div class="subpanel">
+            <h3>Prompt State</h3>
+            <pre id="prompt-text" class="output">No active prompt</pre>
+          </div>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Latest Result</h2>
+        <div id="result-svg" class="svg-box empty">No result yet</div>
+        <div class="result-nav">
+          <button id="result-prev-btn" type="button">Prev</button>
+          <span id="result-page-label">1 / 1</span>
+          <button id="result-next-btn" type="button">Next</button>
+        </div>
+        <div class="subpanel">
+          <h3>3D Structure</h3>
+          <iframe
+            id="molstar-frame"
+            class="molstar-box empty"
+            title="Molstar Viewer"
+            src="./molstar_viewer.html"
+          ></iframe>
+        </div>
+        <pre id="result-text" class="output">No generation has been run</pre>
+      </section>
+    </div>
+
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

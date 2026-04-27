@@ -1,0 +1,20 @@
+dataset:
+  pdb_paths:
+    - ./demo/data/8u4r_chothia.pdb
+  tgt_chains:
+    - R
+  lig_chains:
+    - HL
+
+templates:
+  # antibody (requires a pre-docked antigen-framework complex)
+  - class: AntibodyMultipleCDR
+    cdr_types: [HCDR1, HCDR2, HCDR3, LCDR3]
+    length_ranges: 
+      HCDR1: [6, 8]
+      HCDR2: [5, 7]
+      HCDR3: [15, 18]
+      LCDR3: [8, 10]
+
+batch_size: 16
+n_samples: 50  # candidates for each complex

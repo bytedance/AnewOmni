@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Molstar Viewer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/molstar@4/build/viewer/molstar.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+
+    #viewer-root {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    #placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 14px;
+      background: #ffffff;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer-root">
+    <div id="placeholder">No CIF available</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/molstar@4/build/viewer/molstar.js"></script>
+  <script>
+    async function main() {
+      const params = new URLSearchParams(window.location.search);
+      const cifUrl = params.get("cif_url");
+      const placeholder = document.getElementById("placeholder");
+      if (!cifUrl) {
+        return;
+      }
+      if (!window.molstar || !window.molstar.Viewer) {
+        placeholder.textContent = "Mol* failed to load";
+        return;
+      }
+      const viewer = await window.molstar.Viewer.create("viewer-root", {
+        layoutShowControls: false,
+        layoutShowSequence: false,
+        layoutShowLog: false,
+        layoutShowLeftPanel: false,
+        viewportShowExpand: false,
+        viewportShowSelectionMode: false,
+      });
+      placeholder.style.display = "none";
+      await viewer.loadStructureFromUrl(cifUrl, "mmcif", false);
+    }
+
+    main().catch((error) => {
+      const placeholder = document.getElementById("placeholder");
+      placeholder.textContent = `Mol* error: ${error.message}`;
+    });
+  </script>
+</body>
+</html>

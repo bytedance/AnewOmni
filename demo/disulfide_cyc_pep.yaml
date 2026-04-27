@@ -1,0 +1,16 @@
+dataset:
+  pdb_paths:
+    - ./demo/data/8u4r_chothia.pdb
+  tgt_chains:
+    - R
+  lig_chains:
+    - HL
+
+templates:
+  - class: DiSulfidePeptide
+    size_min: 8
+    size_max: 13  # exclusive, [8, 13)
+    w: 1.0
+
+batch_size: 16
+n_samples: 50  # 50 candidates for each complex

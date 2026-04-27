@@ -1,0 +1,26 @@
+interactions:
+  - Cationic
+  - HBAcceptor
+  - HBDonor
+  - CationPi
+  - PiCation
+  - EdgeToFace
+  - FaceToFace
+
+
+protein_path: 'api/protein_mae_file/IL-4R_6WGL.mae'
+region_interaction_dict:
+  '1':
+    - ['LEU39.C', 'HBAcceptor']
+  '2':
+    - ['PHE41.C', 'EdgeToFace']
+    - ['PHE41.C', 'FaceToFace']
+  '3':
+    - ['ASP66.C', 'Cationic']
+  '4':
+    - ['ASP72.C', 'HBDonor']
+  '5':
+    - ['TYR74.C', 'EdgeToFace']
+
+
+  
