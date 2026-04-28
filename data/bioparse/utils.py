@@ -215,7 +215,7 @@ def assign_bond(refmol: Chem.Mol, mol: Chem.Mol) -> Chem.Mol:
     try: # Assume that ref_mol and mol have exactly the same atom orders
         assert all([mol2.GetAtomWithIdx(i).GetSymbol() == refmol2.GetAtomWithIdx(i).GetSymbol() for i in range(refmol2.GetNumAtoms())]), 'Switch to substruct matching'
         conf.SetPositions(coords)
-    except:
+    except (AssertionError, ValueError):
         # -Backup mapping strategy - to find matched substruct
         # Set bonds to SINGLE
         for b in mol2.GetBonds():

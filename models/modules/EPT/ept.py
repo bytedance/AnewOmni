@@ -20,7 +20,7 @@ from .radial_basis import RadialBasis
 try:
     from xformers.ops import memory_efficient_attention as attn_func
     xformers_enable = True
-except:
+except ImportError:
     xformers_enable = False
 
 

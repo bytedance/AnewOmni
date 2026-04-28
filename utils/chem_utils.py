@@ -651,9 +651,9 @@ def _neutralize_atoms(mol):
                 atom.SetFormalCharge(0)
                 atom.SetNumExplicitHs(hcount - chg)
                 atom.UpdatePropertyCache()
-    except:
+    except Exception:
         return mol
-    
+
 def _remove_all_charges_and_hydrogens(mol):
     """
     Remove all charges and hydrogens from molecule
@@ -665,7 +665,7 @@ def _remove_all_charges_and_hydrogens(mol):
         mol = Chem.RemoveHs(mol)
         # remove charges
         mol = _neutralize_atoms(mol)
-    except:
+    except Exception:
         return mol
 
 def get_rdkit_rmsd(sdf_path_gen:str, sdf_path_ref:str) -> float:
@@ -678,7 +678,7 @@ def get_rdkit_rmsd(sdf_path_gen:str, sdf_path_ref:str) -> float:
     # Round1. calculate directly
     try:
         rmsd = CalcRMS(mol_gen, mol_ref)
-    except:
+    except (ValueError, RuntimeError):
         rmsd = np.nan
     if not np.isnan(rmsd):
         return rmsd
@@ -687,7 +687,7 @@ def get_rdkit_rmsd(sdf_path_gen:str, sdf_path_ref:str) -> float:
         mol_ref_uncharged = _remove_all_charges_and_hydrogens(mol_ref)
         mol_gen_uncharged = _remove_all_charges_and_hydrogens(mol_gen)
         rmsd = CalcRMS(mol_gen_uncharged, mol_ref_uncharged)
-    except:
+    except (ValueError, RuntimeError):
         rmsd = np.nan
     if not np.isnan(rmsd):
         return rmsd
@@ -695,9 +695,9 @@ def get_rdkit_rmsd(sdf_path_gen:str, sdf_path_ref:str) -> float:
     try:
         mol_gen_with_bo = AssignBondOrdersFromTemplate(mol_ref, mol_gen)
         rmsd = CalcRMS(mol_gen_with_bo, mol_ref)
-    except:
+    except (ValueError, RuntimeError):
         rmsd = np.nan
-    
+
     return rmsd
 
 def get_rmsd_from_coord(sdf_path_gen:str, sdf_path_ref:str) -> float:

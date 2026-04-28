@@ -6,6 +6,7 @@
 import posebusters
 from posebusters import PoseBusters
 from pathlib import Path
+from json import JSONDecodeError
 from yaml import safe_load
 
 def create_fast_config(mode='dock', loose_th=False):
@@ -49,5 +50,5 @@ def denovo_validity(pocket_file, mol_sdf, remove_energy_term=False, loose_th=Fal
             for check_type in data[key]: valid = valid and data[key][check_type]
             is_valid.append(valid)
         return is_valid, data
-    except:
+    except (JSONDecodeError, KeyError, ValueError):
         return [False], None

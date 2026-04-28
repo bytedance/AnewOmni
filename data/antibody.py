@@ -7,6 +7,8 @@ import os
 import random
 from typing import Optional, List
 
+from utils.logger import print_log
+
 import numpy as np
 
 from utils import register as R
@@ -145,7 +147,7 @@ class AntibodyDataset(BaseDataset):
 
     def __getitem__(self, idx: int):
         item = super().__getitem__(idx)
-        if len(item['bonds']) == 0: print(self.get_summary(idx))
+        if len(item['bonds']) == 0: print_log(self.get_summary(idx), level='WARN')
         return item
     
 
