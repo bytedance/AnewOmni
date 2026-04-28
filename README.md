@@ -69,9 +69,9 @@ dataset:
   pdb_paths:
     - ./demo/data/8u4r_chothia.pdb   # Path to the reference complex. Both pdb files and mmcif files are supported
   tgt_chains:
-    - R     # The target proteins only include one chain, that is A.
+    - R     # The target proteins only include one chain, that is R.
   lig_chains:
-    - HL    # The reference binder includes two chains, that is H and I. With antibody provided, the program assumes the heavy chain goes before the light chain, which means it will regard H as the heavy chain and I as the light chain in this case.
+    - HL    # The reference binder, which is an antibody, includes two chains, H and L. For antibody cdr design, the program assumes the heavy chain goes before the light chain, which means it will regard H as the heavy chain and L as the light chain in this case.
 
 templates:
   # Here we specify the type of binders we want to design
