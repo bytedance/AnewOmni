@@ -43,9 +43,8 @@ def parse():
 
     # cofold configurations
     # Default to protenix.
-    parser.add_argument('--cofold_model', type=str, default='protenix', choices=['alphafold3', 'boltz2', 'protenix'])
+    parser.add_argument('--cofold_model', type=str, default='protenix', choices=['boltz2', 'protenix'])
     # Backend-specific configs:
-    # - alphafold3: repo_dir/env/db/param are used by alphafold3_predict.sh
     # - boltz2: env should be a conda prefix containing `bin/boltz`; param is used as boltz cache/weights dir
     # - protenix: env should be a conda prefix containing `bin/protenix`; param can be a model name
     parser.add_argument('--cofold_repo_dir', type=str, default='')
@@ -490,14 +489,14 @@ def main(args):
         RANKING_WEIGHTS = ranking_weights
     need_renumber = config.get('need_renumber', True)
     print_log(f'Enabled renumbering cofold-predicted binders: {need_renumber}')
-    # alphafold 3 working directory
+    # cofold model working directory
     cofold_work_dir = os.path.join(args.save_dir, 'cofold')
     if os.path.exists(cofold_work_dir):
         print_log(f'Directory for cofold exists. Removing it: {cofold_work_dir}', level='WARN')
         shutil.rmtree(cofold_work_dir)
     proj_dir = os.path.join(cofold_work_dir, config['name'])
     cofold_n_seeds = config.get('cofold_n_seeds', 1)
-    print_log(f'Alphafold 3 working directory: {proj_dir}, number of seeds for each prediction: {cofold_n_seeds}')
+    print_log(f'Cofold model working directory: {proj_dir}, number of seeds for each prediction: {cofold_n_seeds}')
     os.makedirs(proj_dir, exist_ok=True)
 
     # Initialize Ray

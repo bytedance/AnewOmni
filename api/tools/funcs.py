@@ -121,17 +121,6 @@ def renumber_ab(in_path, out_path, tgt_chains, hchain, hmark, lchain, lmark):
     complex_to_mmcif(cplx, out_path, tgt_chains + lig_chains)
 
 
-def cleanup_af3_server(proj_dir):
-    for f in os.listdir(proj_dir):
-        if not f.endswith('.json'): continue
-        os.remove(os.path.join(proj_dir, f))
-        name = f.replace('.json', '')
-        log_dir = os.path.join(proj_dir, 'logs', name)
-        output_dir = os.path.join(proj_dir, 'output', name)
-        if os.path.exists(name): shutil.rmtree(log_dir)
-        if os.path.exists(output_dir): shutil.rmtree(output_dir)
-
-
 def cleanup_cofold_server(proj_dir):
     """
     Delete all cofold task artifacts while keeping the root directory layout.

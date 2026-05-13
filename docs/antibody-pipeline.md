@@ -42,7 +42,6 @@ The pipeline currently supports:
 
 - `protenix`
 - `boltz2`
-- `alphafold3`
 
 The default backend is `protenix` and can be changed with the `--cofold_model` argument. You can choose the most suitable one for you to install.
 
@@ -91,57 +90,6 @@ Backend notes:
 - `--cofold_param` is used as the Boltz2 cache / weights directory.
 - If `--cofold_env` and `--cofold_param` are omitted, `ab_design.py` automatically uses `./api/tools/cofold/boltz2/env` and `./api/tools/cofold/boltz2/params`.
 
-### AlphaFold3
-
-Recommended setup:
-
-```bash
-bash ./api/tools/af3_scripts/setup.sh
-```
-
-The setup script prepares the following local layout:
-
-```bash
-./api/tools/af3_scripts/alphafold3
-./api/tools/af3_scripts/alphafold3/env
-./api/tools/af3_scripts/alphafold3/dummy_databases
-```
-
-Required paths:
-
-- `--cofold_repo_dir`: AlphaFold3 repository root
-- `--cofold_env`: AlphaFold3 environment
-- `--cofold_db`: AlphaFold3 databases
-- `--cofold_param`: AlphaFold3 model parameters
-
-Backend notes:
-
-- Unlike `protenix` and `boltz2`, AlphaFold3 does not auto-fill backend paths from `api/tools/cofold/<model>/...`.
-- A typical local configuration after running `setup.sh` is:
-
-```bash
---cofold_repo_dir ./api/tools/af3_scripts/alphafold3
---cofold_env ./api/tools/af3_scripts/alphafold3/env
---cofold_db ./api/tools/af3_scripts/alphafold3/dummy_databases
---cofold_param /path/to/alphafold3/params
-```
-
-- The `dummy_databases` folder is only used to bypass AlphaFold3 code checks. This antibody pipeline does not rely on online MSA or template search inside AlphaFold3.
-- You still need to obtain the official AlphaFold3 model parameters separately.
-- A typical parameter directory should look like:
-
-```bash
-/path/to/alphafold3/params/
-`-- af3.bin.zst
-```
-
-- Point `--cofold_param` to that parameter directory.
-- If you are using V100 GPUs, add the following line to `api/tools/af3_scripts/alphafold3_predict.sh`:
-
-```bash
-export XLA_FLAGS="--xla_disable_hlo_passes=custom-kernel-fusion-rewriter"
-```
-
 ## Entry Point
 
 The pipeline entry point is:
@@ -167,11 +115,9 @@ python -m api.tools.ab_design \
 
 #### Cofolding Backend
 
-- `--cofold_model`: one of `alphafold3`, `boltz2`, `protenix`; default `protenix`
+- `--cofold_model`: one of `boltz2`, `protenix`; default `protenix`
 - `--cofold_env`: backend environment path
 - `--cofold_param`: backend parameter / cache directory
-- `--cofold_db`: backend database path, used by `alphafold3`
-- `--cofold_repo_dir`: backend repo root, used by `alphafold3`
 
 Auto-filled defaults:
 
@@ -206,19 +152,6 @@ python -m api.tools.ab_design \
   --cofold_model protenix \
   --cofold_env /path/to/protenix/env \
   --cofold_param /path/to/protenix/params
-```
-
-#### AlphaFold3 with Explicit Backend Paths
-
-```bash
-python -m api.tools.ab_design \
-  --config demo/antibody_pipeline.yaml \
-  --save_dir ./output/ab_pipeline_af3 \
-  --cofold_model alphafold3 \
-  --cofold_repo_dir /path/to/alphafold3 \
-  --cofold_env /path/to/alphafold3/env \
-  --cofold_db /path/to/alphafold3/databases \
-  --cofold_param /path/to/alphafold3/params
 ```
 
 ## YAML Configuration

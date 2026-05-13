@@ -53,7 +53,7 @@ class ChainData:
     id: str  # chain id
     sequence: str
     modifications: list
-    # AF3-style MSA/template payloads (strings/objects embedded in input json).
+    # MSA/template payloads (strings/objects embedded in input json).
     # If MSA is disabled, set to ''.
     unpairedMsa: Optional[str] = None
     pairedMsa: Optional[str] = None
@@ -91,7 +91,7 @@ class ChainData:
         self.sequence = seq
 
     def get_data_with_manual_template(self, cif_path):
-        # Legacy helper: embed template mmCIF as AF3-style per-chain template.
+        # Legacy helper: embed template mmCIF as per-chain template.
         cplx = mmcif_to_complex(cif_path, selected_chains=[self.id])
         cif_str = cofold_utils._get_chain_str(cplx, self.id)
         idx = list(range(len(self.sequence)))
@@ -228,112 +228,6 @@ class CofoldBackend(ABC):
     Implementation of different cofolding backends
 '''
 
-class AlphaFold3Backend(CofoldBackend):
-    name = "alphafold3"
-
-    def input_suffixes(self) -> List[str]:
-        return [".json"]
-
-    def get_task_name(self, input_path: str) -> str:
-        return json.load(open(input_path, "r"))["name"]
-
-    def _chain_to_input_entry(self, chain: ChainData) -> Dict[str, Any]:
-        item = {
-            "id": chain.id,
-            "sequence": chain.sequence,
-            "modifications": chain.modifications,
-        }
-        if chain.unpairedMsa is not None:
-            item["unpairedMsa"] = chain.unpairedMsa
-        if chain.pairedMsa is not None:
-            item["pairedMsa"] = chain.pairedMsa
-        if chain.templates is not None:
-            item["templates"] = chain.templates
-        return {chain.type: item}
-
-    def write_input(
-        self,
-        name: str,
-        chains: List[ChainData],
-        out_path: str,
-        n_seeds: int = 1,
-        include_chains: Optional[List[str]] = None,
-    ) -> str:
-        if include_chains is None:
-            include_chains = [c.id for c in chains]
-        data = [self._chain_to_input_entry(chain) for chain in chains if chain.id in include_chains]
-        input_json = {
-            "name": name,
-            "dialect": "alphafold3",
-            "version": 2,
-            "modelSeeds": [random.randint(0, 4294967295) for _ in range(n_seeds)],
-            "bondedAtomPairs": None,
-            "userCCD": None,
-            "sequences": data,
-        }
-        os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-        with open(out_path, "w") as fout:
-            json.dump(input_json, fout, indent=2)
-        return out_path
-
-    def load_confidences(
-        self,
-        summary_json_path: str,
-        tgt_chains: List[str],
-        lig_chains: List[str],
-    ) -> Dict[str, Any]:
-        c2i = {c: i for i, c in enumerate(sorted(tgt_chains + lig_chains))}
-        if len(tgt_chains) == 0 or len(lig_chains) == 0:
-            iptm_row_cols = None
-        else:
-            iptm_row_cols = [(c2i[c1], c2i[c2]) for c1 in tgt_chains for c2 in lig_chains]
-        item = cofold_utils.load_confidences(summary_json_path, tgt_chains, lig_chains, iptm_row_cols)
-        binder_plddt = item.get("binder_plddt")
-        return {
-            "cofold_iptm": item.get("iptm"),
-            "cofold_ptm": item.get("ptm"),
-            "cofold_ranking_score": item.get("ranking_score"),
-            # AF3 parser returns binder_plddt in [0, 100]
-            "cofold_binder_plddt": (binder_plddt * 0.01) if binder_plddt is not None else None,
-            "cofold_ipae": item.get("ipae"),
-        }
-
-    def build_command(self, cfg: BackendTaskConfig, gpu_ids: List[str], input_path: str, out_dir: str) -> str:
-        script_path = os.path.abspath(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "af3_scripts", "alphafold3_predict.sh")
-        )
-        if not os.path.exists(script_path):
-            raise FileNotFoundError(f"Cannot find AF3 script: {script_path}")
-
-        cmd = f"""
-            CUDA_VISIBLE_DEVICES={','.join(gpu_ids)} \\
-            AF3_REPO_DIR={cfg.repo_dir} \\
-            AF3_ENV={cfg.env} \\
-            AF3_DB={cfg.db} \\
-            AF3_PARAM={cfg.param} \\
-            bash {script_path} \\
-            --json_path {input_path} \\
-            --output_dir {out_dir}
-        """
-        return cmd
-
-    def apply_manual_template(self, chain: Any, cif_path: str) -> Any:
-        # AF3 templates are embedded per-chain with explicit indices.
-        data = chain.__class__(**chain.__dict__)
-        cplx = mmcif_to_complex(cif_path, selected_chains=[chain.id])
-        cif_str = cofold_utils._get_chain_str(cplx, chain.id)
-        idx = list(range(len(chain.sequence)))
-        template = {
-            "mmcif": cif_str,
-            "queryIndices": idx,
-            "templateIndices": idx,
-        }
-        data.unpairedMsa = ""
-        data.pairedMsa = ""
-        data.templates = [template]
-        return data
-
-
 class Boltz2Backend(CofoldBackend):
     name = "boltz2"
 
@@ -374,7 +268,7 @@ class Boltz2Backend(CofoldBackend):
                 if "cif" in template or "pdb" in template:
                     templates.append(dict(template))
                     continue
-                # Convert AF3-style per-chain template metadata into a Boltz
+                # Convert per-chain template metadata into a Boltz
                 # top-level template entry. Boltz will auto-match the provided
                 # template structure to the specified chain.
                 mmcif_path = template.get("mmcifPath")
@@ -990,8 +884,6 @@ class ProtenixBackend(CofoldBackend):
 
 
 def get_backend(model: str) -> CofoldBackend:
-    if model == AlphaFold3Backend.name:
-        return AlphaFold3Backend()
     if model == Boltz2Backend.name:
         return Boltz2Backend()
     if model == ProtenixBackend.name:

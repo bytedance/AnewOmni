@@ -37,7 +37,7 @@ def load_confidences(json_path, tgt_chains, lig_chains, iptm_row_cols=None):
     binder_plddts = [plddt for plddt, c in zip(atom_plddts, atom_chain_ids) if c in lig_chains]
 
     # ipAE
-    # bugs from AF3: in atom_chain_ids, the chain ids are the same as given,
+    # bugs: in atom_chain_ids, the chain ids are the same as given,
     # but in token_chain_ids, the chain ids are A, B, C, ...
     ac2i, tc2i = {}, {}
     for c in item['atom_chain_ids']:
@@ -157,7 +157,7 @@ def get_template(seq, c, cif_path, out_path):
         seq: sequence to predict
         c: chain id in the cif file
         cif_path: the template file
-        out_path: output path (add marker to the cif file for AF3)
+        out_path: output path (add marker to the cif file)
     '''
     # load the original cif file
     file = CIFFile.read(cif_path)
@@ -182,7 +182,7 @@ def get_template(seq, c, cif_path, out_path):
             template_idxs.append(struct_indices[j])
         if a != '-': k += 1
         if b != '-': j += 1
-    # add release date for alphafold
+    # add release date
     with open(out_path, 'a+') as fout: fout.write('_pdbx_audit_revision_history.revision_date 2012-12-19\n#')
     return (
         out_path,
@@ -201,6 +201,6 @@ def _get_chain_str(cplx, chain):
     with tempfile.NamedTemporaryFile(suffix=".cif") as tmp:
         complex_to_mmcif(cplx, tmp.name)
         cif_str = tmp.read().decode()
-        # don't know why, but AF3 requires the template to have a date mark
+        # don't know why, but some cofolding models require the template to have a date mark
         cif_str += '_pdbx_audit_revision_history.revision_date 2012-12-19\n#'
     return cif_str

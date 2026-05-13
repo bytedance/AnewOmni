@@ -166,11 +166,11 @@ def main(args):
 def parse():
     parser = argparse.ArgumentParser(description='cofold server')
     parser.add_argument('--task_dir', type=str, required=True, help='Directory to store tasks')
-    parser.add_argument('--model', type=str, required=True, choices=['alphafold3', 'boltz2', 'protenix'])
-    parser.add_argument('--repo_dir', type=str, default='', help='Directory of the model repo (AF3 only)')
-    parser.add_argument('--env', type=str, default='', help='Environment (AF3: conda env name/prefix; boltz2: conda prefix)')
-    parser.add_argument('--db', type=str, default='', help='Database dir (AF3 only)')
-    parser.add_argument('--param', type=str, default='', help='Model parameters dir (AF3) or boltz cache/weights dir (boltz2)')
+    parser.add_argument('--model', type=str, required=True, choices=['boltz2', 'protenix'])
+    parser.add_argument('--repo_dir', type=str, default='', help='Directory of the model repo')
+    parser.add_argument('--env', type=str, default='', help='Environment')
+    parser.add_argument('--db', type=str, default='', help='Database dir')
+    parser.add_argument('--param', type=str, default='', help='Model parameters dir')
     return parser.parse_args()
 
 
