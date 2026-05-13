@@ -139,7 +139,8 @@ class CondIterAutoEncoderEdge(nn.Module):
             kl_on_pocket=False,         # whether to exert kl regularization also on pocket nodes
             discrete_timestep=False,
             default_num_steps=10,
-            encode_atom_only=False
+            encode_atom_only=False,
+            kl_free_bits_th=0.1         # prevent posterior collapse
         ) -> None:
         super().__init__()
         self.encoder = create_net(encoder_type, hidden_size, edge_size, encoder_opt)
@@ -190,6 +191,7 @@ class CondIterAutoEncoderEdge(nn.Module):
         self.kl_on_pocket = kl_on_pocket
         self.discrete_timestep = discrete_timestep
         self.default_num_steps = default_num_steps
+        self.kl_free_bits_th = kl_free_bits_th
 
     @property
     def latent_size(self):
@@ -624,7 +626,12 @@ class CondIterAutoEncoderEdge(nn.Module):
         # invariant latent features
         Zh_mu = self.Wh_mu(Zh)
         Zh_log_var = -torch.abs(self.Wh_log_var(Zh)) #Following Mueller et al., z_log_var is log(\sigma^2))
-        Zh_kl_loss = -0.5 * torch.sum((1.0 + Zh_log_var - Zh_mu * Zh_mu - torch.exp(Zh_log_var))[generate_mask]) / (data_size * Zh_mu.shape[-1])
+        # Zh_kl_loss = -0.5 * torch.sum((1.0 + Zh_log_var - Zh_mu * Zh_mu - torch.exp(Zh_log_var))[generate_mask]) / (data_size * Zh_mu.shape[-1])
+        # prevent posterior collapse
+        Zh_kl_loss_unagg = -0.5 * ((1.0 + Zh_log_var - Zh_mu * Zh_mu - torch.exp(Zh_log_var))[generate_mask])
+        th = getattr(self, 'kl_free_bits_th', 0.0)
+        Zh_kl_loss_unagg = torch.where(Zh_kl_loss_unagg > th, Zh_kl_loss_unagg, th)
+        Zh_kl_loss = torch.sum(Zh_kl_loss_unagg) / (data_size * Zh_mu.shape[-1])
         Zh_sampled = Zh_mu if deterministic else Zh_mu + torch.exp(Zh_log_var / 2) * torch.randn_like(Zh_mu)
 
         # equivariant latent features

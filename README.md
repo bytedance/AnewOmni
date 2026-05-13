@@ -40,6 +40,13 @@ After installation, please activate the environment by the following command:
 conda activate AnewOmni
 ```
 
+### Cofolding Models (Optional)
+
+> This section is optional and is only required if you want to run the de novo antibody/nanobody design pipeline (design + structure prediction).
+
+For backend-specific (e.g. protenix, boltz2) setup instructions, please see [docs/antibody-pipeline.md](docs/antibody-pipeline.md). Please also keep these backend environments separate from the main AnewOmni environment.
+
+
 ## Model Checkpoints
 
 The trained model checkpoint (`model.ckpt`) is provided at [github release](https://github.com/bytedance/AnewOmni/releases/tag/init). Please download it into the `checkpoints` folder.
@@ -98,6 +105,18 @@ dataset:
 ```
 
 We have also provided demo configurations for common binder modalities in the Demo section.
+
+### De Novo Antibody Pipeline
+
+The de novo antibody/nanobody design pipeline uses a separate entry point. Here is a demo command:
+
+```bash
+python -m api.tools.ab_design \
+  --config ./demo/antibody_pipeline.yaml \
+  --save_dir ./output
+```
+
+By default, the pipeline uses `protenix` as the cofold backend. For CLI arguments, cofold backend configuration, and the YAML schema supported by the antibody pipeline, please see [docs/antibody-pipeline.md](docs/antibody-pipeline.md).
 
 ## Demo
 
