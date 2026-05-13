@@ -19,6 +19,7 @@
   - [Run](#run)
   - [Demo](#demo)
   - [Interactive UI](#interactive-ui)
+- [Known Issues / Common Pitfalls](#known-issues--common-pitfalls)
 - [Citations](#citations)
 - [License](#license)
 - [Contact Us](#contact-us)
@@ -215,6 +216,19 @@ For the detailed UI documentation, see:
 - [UI Software Development Guide](docs/ui/development.md)
 - [Prompt Language Design](docs/ui/prompt-language-design.md)
 
+# Known Issues / Common Pitfalls
+
+1. **`hotspots` and `lig_chains` are mutually exclusive**
+   
+   Use only one of the two modes to define the binding site:
+   
+   - **`lig_chains`**: For input files containing both target protein *and* reference binder
+   - **`hotspots`**: For input files containing *only target protein* (no reference binder)
+   
+   **warning**: Providing a file with target + reference binder but using `hotspots` mode causes the generated molecules to clash with the reference binder, leading to persistent physical validity filter failures.
+2. **Hotspots should span the entire binding pocket**
+   
+   The model defines the binding pocket as residues within 10 angstrom of specified hotspots. If hotspots are too sparse or widely separated, residues in between may not be included in the pocket model. This causes the generator to "see" empty space where residues actually exist, leading to clashes between generated molecules and unmodeled residues.
 
 # Citations
 
