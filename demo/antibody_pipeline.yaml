@@ -1,0 +1,28 @@
+target:
+  - type: protein
+    chain_id: A
+    sequence: MKEPCFREENANFNKIFLPTIYSIIFLTGIVGNGLVILVMGYQKKLRSMTDKYRLHLSVADLLFVITLPFWAVDAVANWYFGNFLCKAVHVIYTVSLYSSVLILAFISLDRYLAIVHATNSQRPRKLLAEKVVYVGVWIPALLLTIPDFIFANVSEADDRYICDRFYPNDLWVVVFQFQHIMVGLILPGIVILSCYCIIISKLSHSKGHQKRKALKTTVILILAFFACWLPYYIGISIDSFILLEIIKQGCEFENTVHKWISITEALAFFHCCLNPILYAFLGA
+    template:
+      cif: ./demo/data/8u4r_target.cif
+      template_chain_id: R
+
+framework_lib:
+  heavy_chain_id: H
+  light_chain_id: L
+  path: ./api/templates/framework_lib.json
+  template: ./api/templates/framework_lib_templates
+
+epitope: [[A, 2], [A, 3], [A, 4], [A, 5], [A, 6], [A, 7], [A, 9], [A, 10], [A, 11], [A, 155], [A, 150], [A, 181], [A, 159], [A, 162], [A, 164], [A, 165], [A, 166], [A, 167], [A, 168], [A, 169], [A, 170], [A, 232], [A, 265]]
+
+template_options:
+  class: AntibodyMultipleCDR
+  cdr_types:
+    - HCDR3
+
+interaction_specify_cdrs:
+  - HCDR3
+
+batch_size: 8
+batch_n_samples: 10
+  
+name: cxcr4

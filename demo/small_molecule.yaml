@@ -1,0 +1,19 @@
+dataset:
+  pdb_paths:
+    - ./demo/data/8u4r_chothia.pdb
+  tgt_chains:
+    - R
+  lig_chains:
+    - HL
+
+templates:
+  # Small molecule
+  - class: Molecule
+    size_min: 6
+    filters:  # you can add filters here (implemented under api/filters)
+      - class: MolBeautyFilter  # a demo filter to distinguish whether the molecule "looks good"
+        th: 0.5
+
+batch_size: 16
+n_samples: 50  # top-50 candidates for each complex
+patience: 0  # the process stops if 50 samples are generated

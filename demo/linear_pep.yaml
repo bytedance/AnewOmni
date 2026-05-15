@@ -1,0 +1,19 @@
+dataset:
+  pdb_paths:
+    - ./demo/data/8u4r_chothia.pdb
+  tgt_chains:
+    - R
+  lig_chains:
+    - HL
+
+templates:
+  # Linear peptide
+  - class: LinearPeptide
+    size_min: 7
+    size_max: 12
+    filters:
+      - class: AvoidAAFilter
+        avoid_aas: ['C']
+
+batch_size: 16
+n_samples: 50  # 50 candidates for each complex
