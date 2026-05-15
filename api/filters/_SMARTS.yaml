@@ -1,0 +1,29 @@
+# SMARTS filter configuration 
+# RDKit supports CXSMARTS grammar
+
+- pattern: '[I,B,Si,P,As,Sn,Se,S+,Ag,*-]'
+  annotation: MedChem's unfavorable atom types
+
+- pattern: '[N;!R]~[N;!R]'
+  annotation: Two connected non-ring nitrogen atoms (provided by Huidong Yu)
+
+- pattern: '[C;R;$(C-O)]@[C;R;$(C-O)]@[C;R;$(C-O)]'
+  annotation: Three ring Carbon atoms that connected to Oxygen atoms.
+
+- pattern: '[S;$(S([O])[O])]'
+  annotation: Match Sulfur atom that connected to more than one Oxygen atoms.
+
+- pattern: '[NX3]([#6])([#6])-!@[C;X4;!R]-!@[NX3]([#6])([#6])'
+  annotation: Diaminal acyclic (from Lilly rules)
+
+- pattern: '[O,N,S;!$(S~O)]-!@[C;H0;X4](-!@[O,N,S;!$(S~O)])(C)'
+  annotation: Non-ring ketal (from Lilly rules)
+
+- pattern: '[#6]=[#6][N,O]'
+  annotation: vinyl amine or vinyl alcohol (from Yan Shi)
+
+- pattern: '[#7;!R]-[#6;X4]-[#7]'
+  annotation: N-C-N pattern (from Lilly rules, also suggested by Yan Shi)
+
+- pattern: '[#8]-[#6;X4]-[#7] AND NOT ([#8;R]-[#6;X4;R]-[#7;R])'
+  annotation: O-C-N pattern (from Lilly rules, also suggested by Yan Shi)

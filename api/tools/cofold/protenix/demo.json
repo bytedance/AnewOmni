@@ -1,0 +1,35 @@
+[
+  {
+    "name": "test",
+    "sequences": [
+      {
+        "proteinChain": {
+          "count": 1,
+          "sequence": "MKEPCFREENANFNKIFLPTIYSIIFLTGIVGNGLVILVMGYQKKLRSMTDKYRLHLSVADLLFVITLPFWAVDAVANWYFGNFLCKAVHVIYTVSLYSSVLILAFISLDRYLAIVHATNSQRPRKLLAEKVVYVGVWIPALLLTIPDFIFANVSEADDRYICDRFYPNDLWVVVFQFQHIMVGLILPGIVILSCYCIIISKLSHSKGHQKRKALKTTVILILAFFACWLPYYIGISIDSFILLEIIKQGCEFENTVHKWISITEALAFFHCCLNPILYAFLGA",
+          "unpairedMsaPath": "",
+          "pairedMsaPath": ""
+        }
+      },
+      {
+        "proteinChain": {
+          "count": 1,
+          "sequence": "ERLVESGGGVVQPGSSLRLSCAASGFDFSRQGMHWVRQAPGQGLEWVAFIKYDGSEKYHADSVWGRLSISRDNSKDTLYLQMNSLRVEDTATYFCVREAGGPDYRNGYYYYDFYDGYYNYHYMDVWGKGTTVTVSS",
+          "unpairedMsaPath": "",
+          "pairedMsaPath": ""
+        }
+      },
+      {
+        "proteinChain": {
+          "count": 1,
+          "sequence": "SALTQPASVSGSPGQSITISCQGTSNDVGGYESVSWYQQHPGKAPKVVIYDVSKRPSGVSNRFSGSKSGNTASLTISGLQAEDEGDYYCKSLTSRSHRVFGTGTKLTVL",
+          "unpairedMsaPath": "",
+          "pairedMsaPath": ""
+        }
+      }
+    ],
+    "modelSeeds": [
+      4214369720
+    ],
+    "assembly_id": "1"
+  }
+]

@@ -1,0 +1,209 @@
+dataset:
+  train:
+    # biolip
+    - class: DynamicBatchWrapper
+      dataset:
+        class: MixDatasetWrapper
+        datasets:
+          - class: MoleculeDataset
+            mmap_dir: ./datasets/molecule_v2/biolip2_nr/processed/
+            specify_index: ./datasets/molecule_v2/biolip2_nr/processed/finetune_index.txt
+            cluster: ./datasets/molecule_v2/biolip2_nr/processed/finetune_cluster.txt
+            in_memory: true
+          - class: MoleculeDataset
+            mmap_dir: ./datasets/molecule_v2/biolip2_nr/processed/
+            specify_index: ./datasets/molecule_v2/biolip2_nr/processed/pretrain_index.txt
+            cluster: ./datasets/molecule_v2/biolip2_nr/processed/pretrain_cluster.txt
+            in_memory: true
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+    # Small Molecules
+    - class: DynamicBatchWrapper
+      dataset:
+        class: MixDatasetWrapper
+        datasets:
+          # crossdocked
+          - class: MoleculeDataset
+            mmap_dir: ./datasets/molecule_v2/CrossDocked/processed
+            specify_index: ./datasets/molecule_v2/CrossDocked/processed/train_index.txt
+            in_memory: true
+          # pdbbind general set minus refined set
+          - class: MoleculeDataset
+            mmap_dir: ./datasets/molecule_v2/PDBbind/processed/v2020-other-PL
+            cluster: ./datasets/molecule_v2/PDBbind/processed/v2020-other-PL/index.cluster
+            in_memory: true
+          # pdbbind refined set
+          - class: MoleculeDataset
+            mmap_dir: ./datasets/molecule_v2/PDBbind/processed/refined-set
+            specify_index: ./datasets/molecule_v2/PDBbind/processed/refined-set/train_index.txt
+            cluster: ./datasets/molecule_v2/PDBbind/processed/refined-set/train.cluster
+            in_memory: true
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+    # SIU
+    - class: DynamicBatchWrapper
+      dataset:
+        class: MixDatasetWrapper
+        datasets:
+          - class: MoleculeDataset
+            mmap_dir: ./datasets/molecule_v2/SIU/processed
+            cluster: ./datasets/molecule_v2/SIU/processed/index.cluster
+            in_memory: false
+        weights: [0.05]
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+    # Peptides
+    - class: DynamicBatchWrapper
+      dataset:
+        class: MixDatasetWrapper
+        datasets:
+          # protein-fragments
+          - class: PeptideDataset
+            mmap_dir: ./datasets/peptide/ProtFrag/processed
+            in_memory: true
+          # pepbench
+          - class: PeptideDataset
+            mmap_dir: ./datasets/peptide/pepbench/processed
+            specify_index: ./datasets/peptide/pepbench/processed/train_index.txt
+            cluster: ./datasets/peptide/pepbench/train.cluster
+            in_memory: true
+          # protein-peptide complex with non standard amino acids
+          - class: PeptideDataset
+            mmap_dir: ./datasets/peptide/pepbench/processed
+            specify_index: ./datasets/peptide/pepbench/processed/non_standard_index.txt
+            in_memory: true
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+    # Antibody
+    - class: DynamicBatchWrapper
+      dataset:
+        class: MixDatasetWrapper
+        datasets:
+          - class: AntibodyDataset
+            mmap_dir: ./datasets/antibody/SAbDab/processed
+            specify_index: ./datasets/antibody/SAbDab/processed/train_index.txt
+            in_memory: true
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+  valid:
+    - class: DynamicBatchWrapper
+      dataset: 
+        class: PeptideDataset
+        mmap_dir: ./datasets/peptide/pepbench/processed
+        specify_index: ./datasets/peptide/pepbench/processed/valid_index.txt
+        in_memory: true
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+    - class: DynamicBatchWrapper
+      dataset: 
+        class: MoleculeDataset
+        mmap_dir: ./datasets/molecule_v2/PDBbind/processed/refined-set
+        specify_index: ./datasets/molecule_v2/PDBbind/processed/refined-set/valid_index.txt
+        in_memory: true
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+    - class: DynamicBatchWrapper
+      dataset: 
+        class: AntibodyDataset
+        mmap_dir: ./datasets/antibody/SAbDab/processed
+        specify_index: ./datasets/antibody/SAbDab/processed/valid_index.txt
+        in_memory: true
+      complexity: n*n
+      ubound_per_batch: 12000000
+      n_use_max_in_batch: true
+      silent: true
+
+dataloader:
+  train:
+    shuffle: true
+    num_workers: 16
+  valid:
+    num_workers: 16
+
+trainer:
+  class: IterAETrainer
+  criterion: loss
+  config:
+    max_epoch: 500
+    save_topk: 10
+    val_freq: 10
+    save_dir: ./ckpts/vae
+    patience: 10
+    warmup: 0 # gradually increasing KL divergence for training stability (8 A800 GPUs)
+    grad_clip: 10.0
+    metric_min_better: true
+    enable_mixed_precision: false
+    proj_name: AnewOmni
+    logger: tensorboard
+    continue_version: 0
+
+    optimizer:
+      class: AdamW
+      lr: 1.0e-4
+
+    scheduler:
+      class: ReduceLROnPlateau
+      factor: 0.8
+      patience: 5
+      mode: min
+      frequency: val_epoch
+      min_lr: 5.0e-6
+
+model:
+  class: CondIterAutoEncoderEdge
+  encoder_type: EPT
+  decoder_type: EPT
+  embed_size: 512
+  hidden_size: 512
+  latent_size: 8
+  edge_size: 64
+  k_neighbors: 9
+  encoder_opt:
+    n_rbf: 64
+    cutoff: 10.0
+    n_layers: 6
+    n_head: 8
+    use_edge_feat: true
+    pre_norm: true
+    efficient: false
+    vector_act: layernorm
+  decoder_opt:
+    n_rbf: 64
+    cutoff: 10.0
+    n_layers: 6
+    n_head: 8
+    use_edge_feat: true
+    pre_norm: true
+    efficient: false
+    vector_act: layernorm
+  loss_weights:
+    Zh_kl_loss: 0.8
+    Zx_kl_loss: 1.0
+    atom_coord_loss: 1.0
+    block_type_loss: 1.0
+    contrastive_loss: 0.1
+    local_distance_loss: 0.5
+    bond_loss: 0.5
+    bond_length_loss: 0.0
+  prior_coord_std: 1.0
+  coord_noise_scale: 1.0
+  pocket_mask_ratio: 0.05
+  decode_mask_ratio: 0.0
+  kl_on_pocket: false
+  discrete_timestep: false
+
+load_ckpt: ''
