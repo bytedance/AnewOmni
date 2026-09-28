@@ -9,3 +9,4 @@ from .L_type_AA import *
 from .mmseqs import SeqIDFilter
 from .runner import AsyncFilterRunner
 from .mol_beauty import *
+from .motif_rmsd import *
